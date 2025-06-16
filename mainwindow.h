@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "qstandarditemmodel.h"
 #include <QMainWindow>
 #include <QStringListModel>
 
@@ -14,6 +15,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+struct Ticket {
+    int id;
+    int price;
+    int count;
+};
+
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -21,13 +28,20 @@ public:
 
 
 private slots:
-    void on_pushButton_clicked();
+    void on_addTicketsBtb_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_generateFileBtn_clicked();
+
+    void on_ticketsListView_customContextMenuRequested(const QPoint &pos);
+    void deleteAction();
+
+    void on_ticketsListView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
-    QStringListModel *model;
+    QStandardItemModel *model;
     QStringList dataList;
+    QModelIndex selectedIndexForDeletion;
+    int lastId = 0;
 };
 #endif // MAINWINDOW_H

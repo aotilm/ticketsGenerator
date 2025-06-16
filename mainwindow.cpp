@@ -1,22 +1,49 @@
 #include "mainwindow.h"
+#include "qstandarditemmodel.h"
 #include "ui_mainwindow.h"
 #include <QPdfWriter>
 #include <QPainter>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDateTime>
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
 
-    model = new QStringListModel(this);
-    dataList << "Початковий запис";
-    model->setStringList(dataList);
+    // або фіксований розмір
+    setFixedSize(700, 370);
+
+    QList<Ticket> tickets = {
+        {1, 30, 3000},
+        {2, 25, 1200},
+        {3, 10, 500}
+    };
+
+    model = new QStandardItemModel(this);
+
+    for (const Ticket &t : tickets) {
+        QString displayText = QString("Ціна: %1  /  Кількість: %2")
+                                  .arg(t.price)
+                                  .arg(t.count);
+
+        QStandardItem *item = new QStandardItem(displayText);
+        item->setData(t.id, Qt::UserRole); // Зберігаємо ID
+        model->appendRow(item);
+    }
 
     ui->ticketsListView->setModel(model);
+
+
+
+    ui->ticketsListView->setModel(model);
+
+    ui->ticketsListView->setContextMenuPolicy(Qt::CustomContextMenu);
+
 }
 
 MainWindow::~MainWindow()
@@ -24,7 +51,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_generateFileBtn_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(
         this,
@@ -89,9 +116,6 @@ void MainWindow::on_pushButton_clicked()
     painter.end();
     QMessageBox::information(this, "Готово", "PDF збережено:\n" + fileName);
 }
-
-
-
 
 void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumber)
 {
@@ -199,10 +223,45 @@ void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumb
 
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_addTicketsBtb_clicked()
 {
-    QString newEntry = QString("Новий запис %1").arg(dataList.size() + 1);
-    dataList.append(newEntry);
-    model->setStringList(dataList);
+    Ticket t = {lastId, ui->priceEdit->text().toInt(), ui->countEdit->text().toInt()};
+    QString displayText = QString("Ціна: %1  /  Кількість: %2")
+                              .arg(t.price)
+                              .arg(t.count);
+
+    QStandardItem *item = new QStandardItem(displayText);
+    item->setData(t.id, Qt::UserRole);
+    model->appendRow(item);
+
+    lastId++;
+}
+
+
+void MainWindow::on_ticketsListView_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndex index = ui->ticketsListView->indexAt(pos);
+    if (!index.isValid())
+        return;
+
+    selectedIndexForDeletion = index;
+
+    QMenu contextMenu(this);
+    contextMenu.addAction("Видалити", this, SLOT(deleteAction()));
+
+    contextMenu.exec(ui->ticketsListView->viewport()->mapToGlobal(pos));
+}
+
+void MainWindow::deleteAction()
+{
+    if (selectedIndexForDeletion.isValid()) {
+        model->removeRow(selectedIndexForDeletion.row());
+    }
+}
+
+
+void MainWindow::on_ticketsListView_clicked(const QModelIndex &index)
+{
+    int id = index.data(Qt::UserRole).toString().toInt();
 }
 
