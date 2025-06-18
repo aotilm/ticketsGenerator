@@ -24,7 +24,7 @@ struct Ticket {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void drawTicket(QPainter &painter, const QRect &rect, int ticketNumber);
+    void drawTicket(QPainter &painter, const QRect &rect, QString series, int ticketNumber, int price);
 
 
 private slots:
@@ -34,14 +34,19 @@ private slots:
 
     void on_ticketsListView_customContextMenuRequested(const QPoint &pos);
     void deleteAction();
+    void deleteAllAction();
+
 
     void on_ticketsListView_clicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
     QStandardItemModel *model;
-    QStringList dataList;
+    // QStringList dataList;
+    QList<Ticket> tickets;
     QModelIndex selectedIndexForDeletion;
     int lastId = 0;
+
+    bool validFields();
 };
 #endif // MAINWINDOW_H

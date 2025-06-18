@@ -61,7 +61,7 @@
               <item>
                <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>Серія квитку</string>
+                 <string>Серія квитків</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -139,7 +139,7 @@
                  <enum>Qt::LayoutDirection::RightToLeft</enum>
                 </property>
                 <property name="text">
-                 <string>К-сть квитків у серії</string>
+                 <string>К-сть квитків, шт.</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -159,6 +159,9 @@
                   <width>100</width>
                   <height>20</height>
                  </size>
+                </property>
+                <property name="inputMethodHints">
+                 <set>Qt::InputMethodHint::ImhDigitsOnly</set>
                 </property>
                </widget>
               </item>

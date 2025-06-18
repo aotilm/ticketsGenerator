@@ -143,6 +143,7 @@ public:
         countEdit->setObjectName("countEdit");
         countEdit->setMinimumSize(QSize(50, 20));
         countEdit->setMaximumSize(QSize(100, 20));
+        countEdit->setInputMethodHints(Qt::InputMethodHint::ImhDigitsOnly);
 
         horizontalLayout->addWidget(countEdit);
 
@@ -228,10 +229,10 @@ public:
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
         groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "\320\224\320\260\320\275\321\226 \320\277\321\200\320\276 \320\272\320\262\320\270\321\202\320\276\320\272", nullptr));
         groupBox_3->setTitle(QString());
-        label->setText(QCoreApplication::translate("MainWindow", "\320\241\320\265\321\200\321\226\321\217 \320\272\320\262\320\270\321\202\320\272\321\203", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "\320\241\320\265\321\200\321\226\321\217 \320\272\320\262\320\270\321\202\320\272\321\226\320\262", nullptr));
         groupBox->setTitle(QString());
         label_2->setText(QCoreApplication::translate("MainWindow", "\320\246\321\226\320\275\320\260 \321\201\320\265\321\200\321\226\321\227, \320\263\321\200\320\275.", nullptr));
-        label_3->setText(QCoreApplication::translate("MainWindow", "\320\232-\321\201\321\202\321\214 \320\272\320\262\320\270\321\202\320\272\321\226\320\262 \321\203 \321\201\320\265\321\200\321\226\321\227", nullptr));
+        label_3->setText(QCoreApplication::translate("MainWindow", "\320\232-\321\201\321\202\321\214 \320\272\320\262\320\270\321\202\320\272\321\226\320\262, \321\210\321\202.", nullptr));
         addTicketsBtb->setText(QCoreApplication::translate("MainWindow", "\320\224\320\276\320\264\320\260\321\202\320\270", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\262\320\276\321\200\320\265\320\275\321\226 \320\272\320\262\320\270\321\202\320\272\320\270", nullptr));
         generateFileBtn->setText(QCoreApplication::translate("MainWindow", "\320\227\320\263\320\265\320\275\320\265\321\200\321\203\320\262\320\260\321\202\320\270 \320\272\320\262\320\270\321\202\320\272\320\270", nullptr));

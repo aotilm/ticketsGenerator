@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <QMenu>
+#include <QIntValidator>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,14 +17,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint);
 
+    ui->countEdit->setValidator(new QIntValidator(0, INT_MAX, ui->countEdit));
+    ui->priceEdit->setValidator(new QIntValidator(0, INT_MAX, ui->countEdit));
+
+
     // або фіксований розмір
     setFixedSize(700, 370);
-
-    QList<Ticket> tickets = {
-        {1, 30, 3000},
-        {2, 25, 1200},
-        {3, 10, 500}
-    };
 
     model = new QStandardItemModel(this);
 
@@ -53,6 +53,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_generateFileBtn_clicked()
 {
+    if(ui->seriesEdit->text().isEmpty()){
+        QMessageBox::information(this, " ", "Введіть серію квитків!");
+        return;
+    }
+
+    if(tickets.isEmpty()){
+        QMessageBox::information(this, " ", "Додайте мінімум один квиток!");
+        return;
+    }
+
     QString fileName = QFileDialog::getSaveFileName(
         this,
         "Зберегти PDF",
@@ -65,59 +75,70 @@ void MainWindow::on_generateFileBtn_clicked()
 
     QPdfWriter pdf(fileName);
     pdf.setPageSize(QPageSize(QPageSize::A4));
-    pdf.setResolution(300); // 300 dpi
+    pdf.setResolution(300);
 
     QPainter painter(&pdf);
     painter.setFont(QFont("Arial", 10));
 
-    // Розміри квитка в мм
     const double mmPerInch = 25.4;
     const int dpi = 300;
-
     const double ticketWidthMM = 40.0;
     const double ticketHeightMM = 65.0;
 
-    const int ticketWidth = static_cast<int>(ticketWidthMM * dpi / mmPerInch);   // ≈ 472 px
-    const int ticketHeight = static_cast<int>(ticketHeightMM * dpi / mmPerInch); // ≈ 768 px
+    const int ticketWidth = static_cast<int>(ticketWidthMM * dpi / mmPerInch);
+    const int ticketHeight = static_cast<int>(ticketHeightMM * dpi / mmPerInch);
 
     const int cols = 5;
     const int rows = 4;
+    const int ticketsPerPage = cols * rows;
 
-    // Відступи з урахуванням A4 сторінки
-    const int pageWidth = pdf.width();   // ≈ 2480 px
-    const int pageHeight = pdf.height(); // ≈ 3508 px
+    const int pageWidth = pdf.width();
+    const int pageHeight = pdf.height();
 
     const int gridWidth = cols * ticketWidth;
     const int gridHeight = rows * ticketHeight;
 
-    const int marginX = (pageWidth - gridWidth) / 2;   // ≈ 5 мм
-    const int marginY = (pageHeight - gridHeight) / 2; // ≈ 18.5 мм
+    const int marginX = (pageWidth - gridWidth) / 2;
+    const int marginY = (pageHeight - gridHeight) / 2;
 
-    int ticketIndex = 0;
-    int totalTickets = 30;
+    int ticketNumber = 1;
+    int ticketsOnCurrentPage = 0;
+    int currentRow = 0;
+    int currentCol = 0;
 
-    while (ticketIndex < totalTickets) {
-        for (int row = 0; row < rows && ticketIndex < totalTickets; ++row) {
-            for (int col = 0; col < cols && ticketIndex < totalTickets; ++col) {
-                int x = marginX + col * ticketWidth;
-                int y = marginY + row * ticketHeight;
+    for (const Ticket &t : tickets) {
+        for (int i = 0; i < t.count; ++i) {
+            if (ticketsOnCurrentPage == ticketsPerPage) {
+                pdf.newPage();
+                ticketsOnCurrentPage = 0;
+                currentRow = 0;
+                currentCol = 0;
+            }
 
-                QRect rect(x, y, ticketWidth, ticketHeight);
-                drawTicket(painter, rect, ticketIndex + 1);
+            int x = marginX + currentCol * ticketWidth;
+            int y = marginY + currentRow * ticketHeight;
+            QRect rect(x, y, ticketWidth, ticketHeight);
 
-                ticketIndex++;
+            drawTicket(painter, rect, ui->seriesEdit->text(), ticketNumber, t.price);
+
+            ticketNumber++;
+            ticketsOnCurrentPage++;
+
+            currentCol++;
+            if (currentCol == cols) {
+                currentCol = 0;
+                currentRow++;
             }
         }
-
-        if (ticketIndex < totalTickets)
-            pdf.newPage();
     }
 
     painter.end();
     QMessageBox::information(this, "Готово", "PDF збережено:\n" + fileName);
 }
 
-void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumber)
+
+
+void MainWindow::drawTicket(QPainter &painter, const QRect &rect, QString series, int ticketNumber, int price)
 {
     painter.save(); // Зберігаємо поточний стан
 
@@ -158,7 +179,7 @@ void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumb
     QRect seriesRect(innerLeft, topBox.bottom(), innerWidth, sectionHeight);
     QFont normalFont("Arial", 10);
     painter.setFont(normalFont);
-    painter.drawText(seriesRect, Qt::AlignCenter, "серія А");
+    painter.drawText(seriesRect, Qt::AlignCenter, QString("серія %1").arg(series));
 
     // 3. № + номер
     QRect numberRect(innerLeft + padding, seriesRect.bottom(), innerWidth - 2 * padding, sectionHeight);
@@ -175,7 +196,7 @@ void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumb
     QRect priceRect(innerLeft + padding, mainTextRect.bottom(), innerWidth - 2 * padding, sectionHeight * 1.5);
 
     QString pricePrefix = "Ціна ";
-    QString priceValue = "30";
+    QString priceValue = QString("%1").arg(price);
     QString priceSuffix = " грн";
 
     // Крок 1: обчислюємо ширини кожної частини
@@ -225,17 +246,35 @@ void MainWindow::drawTicket(QPainter &painter, const QRect &rect, int ticketNumb
 
 void MainWindow::on_addTicketsBtb_clicked()
 {
-    Ticket t = {lastId, ui->priceEdit->text().toInt(), ui->countEdit->text().toInt()};
-    QString displayText = QString("Ціна: %1  /  Кількість: %2")
-                              .arg(t.price)
-                              .arg(t.count);
+    if (validFields()) {
+        Ticket t = {
+            lastId,
+            ui->priceEdit->text().toInt(),
+            ui->countEdit->text().toInt()
+        };
 
-    QStandardItem *item = new QStandardItem(displayText);
-    item->setData(t.id, Qt::UserRole);
-    model->appendRow(item);
+        tickets.append(t);
 
-    lastId++;
+        QString displayText = QString("Ціна: %1  /  Кількість: %2")
+                                  .arg(t.price)
+                                  .arg(t.count);
+
+        QStandardItem *item = new QStandardItem(displayText);
+        item->setData(t.id, Qt::UserRole);
+        model->appendRow(item);
+
+        lastId++;
+
+        // Очистити поля
+        ui->countEdit->clear();
+        ui->priceEdit->clear();
+        for (const Ticket &t : tickets) {
+            qDebug() << "ID:" << t.id << "Ціна:" << t.price << "Кількість:" << t.count;
+        }
+
+    }
 }
+
 
 
 void MainWindow::on_ticketsListView_customContextMenuRequested(const QPoint &pos)
@@ -248,6 +287,8 @@ void MainWindow::on_ticketsListView_customContextMenuRequested(const QPoint &pos
 
     QMenu contextMenu(this);
     contextMenu.addAction("Видалити", this, SLOT(deleteAction()));
+    contextMenu.addAction("Видалити все", this, SLOT(deleteAllAction()));
+
 
     contextMenu.exec(ui->ticketsListView->viewport()->mapToGlobal(pos));
 }
@@ -255,9 +296,40 @@ void MainWindow::on_ticketsListView_customContextMenuRequested(const QPoint &pos
 void MainWindow::deleteAction()
 {
     if (selectedIndexForDeletion.isValid()) {
+        int id = selectedIndexForDeletion.data(Qt::UserRole).toInt();
+
+        for (int i = 0; i < tickets.size(); ++i) {
+            if (tickets[i].id == id) {
+                tickets.removeAt(i);
+                break;
+            }
+        }
+
         model->removeRow(selectedIndexForDeletion.row());
+        for (const Ticket &t : tickets) {
+            qDebug() << "ID:" << t.id << "Ціна:" << t.price << "Кількість:" << t.count;
+        }
+
     }
 }
+
+void MainWindow::deleteAllAction()
+{
+    if (selectedIndexForDeletion.isValid()) {
+        int id = selectedIndexForDeletion.data(Qt::UserRole).toInt();
+
+        tickets.clear();
+
+        model->clear();
+
+        for (const Ticket &t : tickets) {
+            qDebug() << "ID:" << t.id << "Ціна:" << t.price << "Кількість:" << t.count;
+        }
+
+    }
+}
+
+
 
 
 void MainWindow::on_ticketsListView_clicked(const QModelIndex &index)
@@ -265,3 +337,11 @@ void MainWindow::on_ticketsListView_clicked(const QModelIndex &index)
     int id = index.data(Qt::UserRole).toString().toInt();
 }
 
+bool MainWindow::validFields(){
+    if(ui->countEdit->text().isEmpty() && ui->priceEdit->text().isEmpty()){
+        QMessageBox::information(this, " ","Введіть вхідні дані!");
+        return false;
+    }
+
+    return true;
+}
