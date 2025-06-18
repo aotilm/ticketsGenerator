@@ -53,9 +53,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../main.cpp \
-		../../mainwindow.cpp moc_mainwindow.cpp
+		../../mainwindow.cpp qrc_resources.cpp \
+		moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
+		qrc_resources.o \
 		moc_mainwindow.o
 DIST          = /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/common/unix.conf \
@@ -390,6 +392,7 @@ DIST          = /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/qt_config.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/spec_post.prf \
+		../../.qmake.stash \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/toolchain.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/default_pre.prf \
@@ -757,6 +760,7 @@ Makefile: ../../ticketsGenerator.pro /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linu
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/qt_config.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/toolchain.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/default_pre.prf \
@@ -779,6 +783,7 @@ Makefile: ../../ticketsGenerator.pro /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linu
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/yacc.prf \
 		/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/lex.prf \
 		../../ticketsGenerator.pro \
+		../../resources.qrc \
 		/home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Widgets.prl \
 		/home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Gui.prl \
 		/home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Core.prl
@@ -1116,6 +1121,7 @@ Makefile: ../../ticketsGenerator.pro /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linu
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/qt_config.prf:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linux-g++/qmake.conf:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/exclusive_builds.prf:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/toolchain.prf:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/default_pre.prf:
@@ -1138,6 +1144,7 @@ Makefile: ../../ticketsGenerator.pro /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linu
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/yacc.prf:
 /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/lex.prf:
 ../../ticketsGenerator.pro:
+../../resources.qrc:
 /home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Widgets.prl:
 /home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Gui.prl:
 /home/illyusha/Qt/6.8.3/gcc_64/lib/libQt6Core.prl:
@@ -1155,6 +1162,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../../resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /home/illyusha/Qt/6.8.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../../main.cpp ../../mainwindow.cpp $(DISTDIR)/
@@ -1182,8 +1190,14 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_resources.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_resources.cpp
+qrc_resources.cpp: ../../resources.qrc \
+		/home/illyusha/Qt/6.8.3/gcc_64/libexec/rcc \
+		../../logo.png
+	/home/illyusha/Qt/6.8.3/gcc_64/libexec/rcc -name resources ../../resources.qrc -o qrc_resources.cpp
+
 compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
@@ -1194,9 +1208,7 @@ compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_mainwindow.cpp
 moc_mainwindow.cpp: ../../mainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qstandarditemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtversionchecks.h \
@@ -1245,30 +1257,26 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qversiontagging.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtgui-config.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qabstractitemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcompare.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcomparehelpers.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20type_traits.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstring.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qchar.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringview.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrefcount.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpair.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydatapointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydataops.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20functional.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20memory.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
@@ -1283,13 +1291,15 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringbuilder.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter_base.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qiterator.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearraylist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcoreevent.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopedpointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmetatype.h \
@@ -1304,22 +1314,30 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopeguard.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbindingstorage.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q23utility.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20utility.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpoint.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qcolor.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgb.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgba64.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qimage.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixelformat.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtransform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpolygon.h \
@@ -1327,21 +1345,19 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qspan.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20iterator.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qline.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfont.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qendian.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontmetrics.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontinfo.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qsizepolicy.h \
@@ -1385,6 +1401,8 @@ moc_mainwindow.cpp: ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlocale.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qguiapplication_platform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/QStringListModel \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlistmodel.h \
 		moc_predefs.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/libexec/moc
 	/home/illyusha/Qt/6.8.3/gcc_64/libexec/moc $(DEFINES) --include /home/illyusha/Documents/qt/ticketsGenerator/build/Desktop_Qt_6_8_3-Debug/moc_predefs.h -I/home/illyusha/Qt/6.8.3/gcc_64/mkspecs/linux-g++ -I/home/illyusha/Documents/qt/ticketsGenerator -I/home/illyusha/Qt/6.8.3/gcc_64/include -I/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets -I/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui -I/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore -I. -I/usr/include/c++/14 -I/usr/include/c++/14/x86_64-redhat-linux -I/usr/include/c++/14/backward -I/usr/lib/gcc/x86_64-redhat-linux/14/include -I/usr/local/include -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
@@ -1406,14 +1424,12 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
 main.o: ../../main.cpp ../../mainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qstandarditemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtversionchecks.h \
@@ -1462,30 +1478,26 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qversiontagging.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtgui-config.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qabstractitemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcompare.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcomparehelpers.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20type_traits.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstring.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qchar.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringview.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrefcount.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpair.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydatapointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydataops.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20functional.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20memory.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
@@ -1500,13 +1512,15 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringbuilder.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter_base.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qiterator.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearraylist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcoreevent.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopedpointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmetatype.h \
@@ -1521,22 +1535,30 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopeguard.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbindingstorage.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q23utility.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20utility.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpoint.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qcolor.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgb.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgba64.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qimage.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixelformat.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtransform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpolygon.h \
@@ -1544,21 +1566,19 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qspan.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20iterator.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qline.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfont.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qendian.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontmetrics.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontinfo.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qsizepolicy.h \
@@ -1602,14 +1622,14 @@ main.o: ../../main.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlocale.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qguiapplication_platform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtabwidget.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/QStringListModel \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlistmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QApplication \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qapplication.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
 mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qstandarditemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qglobal.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtversionchecks.h \
@@ -1658,30 +1678,26 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qversiontagging.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtgui-config.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtguiexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qabstractitemmodel.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcompare.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcomparehelpers.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20type_traits.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstring.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qchar.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringview.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrefcount.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qnamespace.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtmetamacros.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpair.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydatapointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qarraydataops.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontainertools_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qxptype_traits.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20functional.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20memory.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
@@ -1696,13 +1712,15 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringbuilder.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringconverter_base.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhashfunctions.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qiterator.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbytearraylist.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlist.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qalgorithms.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfunctionaltools_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcoreevent.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopedpointer.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmetatype.h \
@@ -1717,22 +1735,30 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qscopeguard.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qobject_impl.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qbindingstorage.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q23utility.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20utility.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qpoint.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qcolor.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgb.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qrgba64.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qimage.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpaintdevice.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qwindowdefs.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qrect.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmargins.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsize.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixelformat.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtransform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpolygon.h \
@@ -1740,21 +1766,19 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qspan.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/q20iterator.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qline.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvariant.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdebug.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtextstream.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcontiguouscache.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qmap.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qshareddata_impl.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qset.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qhash.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qvarlengtharray.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
-		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qbrush.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpixmap.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfont.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qendian.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qicon.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMainWindow \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmainwindow.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qwidget.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qaction.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qkeysequence.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpalette.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontmetrics.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qfontinfo.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qsizepolicy.h \
@@ -1798,8 +1822,87 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qlocale.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qguiapplication_platform.h \
 		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtabwidget.h \
-		ui_mainwindow.h
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/QStringListModel \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qstringlistmodel.h \
+		ui_mainwindow.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/QVariant \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/QIcon \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QApplication \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qapplication.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QGridLayout \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qgridlayout.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qlayout.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qlayoutitem.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qboxlayout.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QGroupBox \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qgroupbox.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qframe.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QHBoxLayout \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QLabel \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qlabel.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpicture.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtextdocument.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QLineEdit \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qlineedit.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtextcursor.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtextformat.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpen.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qtextoption.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QListView \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qlistview.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qitemselectionmodel.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qvalidator.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qregularexpression.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qslider.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qstyle.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qtabbar.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qrubberband.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QPushButton \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qpushbutton.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qabstractbutton.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QScrollArea \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qscrollarea.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QSpacerItem \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QStatusBar \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qstatusbar.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QVBoxLayout \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QWidget \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/QPdfWriter \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpdfwriter.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpagedpaintdevice.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpagelayout.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpagesize.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpageranges.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/QPainter \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/qpainter.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QFileDialog \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdir.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdirlisting.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfiledevice.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qdatetime.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qcalendar.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfile.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qfileinfo.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/qtimezone.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qdialog.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMessageBox \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmessagebox.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtCore/QDateTime \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/QMenu \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtWidgets/qmenu.h \
+		/home/illyusha/Qt/6.8.3/gcc_64/include/QtGui/QIntValidator
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
+
+qrc_resources.o: qrc_resources.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_resources.o qrc_resources.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

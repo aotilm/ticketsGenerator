@@ -72,7 +72,7 @@ public:
         MainWindow->setMinimumSize(QSize(700, 370));
         MainWindow->setMaximumSize(QSize(700, 370));
         QIcon icon;
-        icon.addFile(QString::fromUtf8("logo.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+        icon.addFile(QString::fromUtf8(":/new/prefix1/logo.png"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
         MainWindow->setWindowIcon(icon);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
@@ -199,10 +199,12 @@ public:
         gridLayout_2->setContentsMargins(1, 1, 1, 1);
         scrollArea = new QScrollArea(groupBox_2);
         scrollArea->setObjectName("scrollArea");
+        scrollArea->setFrameShape(QFrame::Shape::NoFrame);
+        scrollArea->setFrameShadow(QFrame::Shadow::Plain);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 366, 264));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 368, 266));
         gridLayout_3 = new QGridLayout(scrollAreaWidgetContents);
         gridLayout_3->setObjectName("gridLayout_3");
         ticketsListView = new QListView(scrollAreaWidgetContents);

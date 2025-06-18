@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->countEdit->setValidator(new QIntValidator(0, INT_MAX, ui->countEdit));
     ui->priceEdit->setValidator(new QIntValidator(0, INT_MAX, ui->countEdit));
 
-
     // або фіксований розмір
     setFixedSize(700, 370);
 
