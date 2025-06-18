@@ -29,8 +29,8 @@
    <string>Tickets Generator</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>logo.png</normaloff>logo.png</iconset>
+   <iconset resource="resources.qrc">
+    <normaloff>:/new/prefix1/logo.png</normaloff>:/new/prefix1/logo.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
@@ -284,6 +284,8 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
