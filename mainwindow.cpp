@@ -132,6 +132,7 @@ void MainWindow::on_generateFileBtn_clicked()
     }
 
     painter.end();
+    deleteAllAction();
     QMessageBox::information(this, "Готово", "PDF збережено:\n" + fileName);
 }
 
@@ -314,7 +315,7 @@ void MainWindow::deleteAction()
 
 void MainWindow::deleteAllAction()
 {
-    if (selectedIndexForDeletion.isValid()) {
+    // if (selectedIndexForDeletion.isValid()) {
         int id = selectedIndexForDeletion.data(Qt::UserRole).toInt();
 
         tickets.clear();
@@ -325,7 +326,7 @@ void MainWindow::deleteAllAction()
             qDebug() << "ID:" << t.id << "Ціна:" << t.price << "Кількість:" << t.count;
         }
 
-    }
+    // }
 }
 
 
