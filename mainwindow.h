@@ -24,7 +24,7 @@ struct Ticket {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void drawTicket(QPainter &painter, const QRect &rect, QString series, int ticketNumber, int price);
+    void drawTicket(QPainter &painter, const QRect &rect, QString series, QString ticketNumber, int price);
 
 
 private slots:
@@ -45,6 +45,8 @@ private:
     // QStringList dataList;
     QList<Ticket> tickets;
     QModelIndex selectedIndexForDeletion;
+    void generatePdfFile(QVector<Ticket> tickets, QString series, QString fileName);
+    int totalTicketCount(const QList<Ticket> &tickets);
     int lastId = 0;
 
     bool validFields();

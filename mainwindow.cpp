@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "QtConcurrent/qtconcurrentrun.h"
 #include "qstandarditemmodel.h"
 #include "ui_mainwindow.h"
 #include <QPdfWriter>
@@ -8,6 +9,9 @@
 #include <QDateTime>
 #include <QMenu>
 #include <QIntValidator>
+#include <QtConcurrent>
+#include <QFutureWatcher>
+
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -72,6 +76,34 @@ void MainWindow::on_generateFileBtn_clicked()
     if (fileName.isEmpty())
         return;
 
+    // Заблокуємо кнопку, щоб користувач не натискав ще раз
+    ui->generateFileBtn->setEnabled(false);
+
+    // Покажемо індикатор або просто повідомлення
+    ui->statusbar->showMessage("Генерується PDF...");
+
+    // Передаємо потрібні копії даних
+    auto series = ui->seriesEdit->text();
+    auto ticketList = tickets;  // Копія списку
+    auto future = QtConcurrent::run([=]() {
+        generatePdfFile(ticketList, series, fileName);
+    });
+
+    auto* watcher = new QFutureWatcher<void>(this);
+    connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+        ui->generateFileBtn->setEnabled(true);
+        ui->statusbar->showMessage("PDF збережено: " + fileName, 5000);
+        deleteAllAction();
+        QMessageBox::information(this, "Готово", "PDF збережено:\n" + fileName);
+        watcher->deleteLater();
+    });
+
+    watcher->setFuture(future);
+}
+
+
+void MainWindow::generatePdfFile(QList<Ticket> tickets, QString series, QString fileName)
+{
     QPdfWriter pdf(fileName);
     pdf.setPageSize(QPageSize(QPageSize::A4));
     pdf.setResolution(300);
@@ -105,6 +137,10 @@ void MainWindow::on_generateFileBtn_clicked()
     int currentRow = 0;
     int currentCol = 0;
 
+    // 🔢 Обчислюємо кількість нулів (наприклад, 4 для 1000+)
+    int totalCount = totalTicketCount(tickets);
+    int digits = QString::number(totalCount).length();
+
     for (const Ticket &t : tickets) {
         for (int i = 0; i < t.count; ++i) {
             if (ticketsOnCurrentPage == ticketsPerPage) {
@@ -118,7 +154,10 @@ void MainWindow::on_generateFileBtn_clicked()
             int y = marginY + currentRow * ticketHeight;
             QRect rect(x, y, ticketWidth, ticketHeight);
 
-            drawTicket(painter, rect, ui->seriesEdit->text(), ticketNumber, t.price);
+            // ➕ Формуємо номер з провідними нулями
+            QString formattedNumber = QString("%1").arg(ticketNumber, digits, 10, QChar('0'));
+
+            drawTicket(painter, rect, series, formattedNumber, t.price);
 
             ticketNumber++;
             ticketsOnCurrentPage++;
@@ -132,17 +171,23 @@ void MainWindow::on_generateFileBtn_clicked()
     }
 
     painter.end();
-    deleteAllAction();
-    QMessageBox::information(this, "Готово", "PDF збережено:\n" + fileName);
 }
 
 
+int MainWindow::totalTicketCount(const QList<Ticket> &tickets)
+{
+    int total = 0;
+    for (const Ticket &t : tickets)
+        total += t.count;
+    return total;
+}
 
-void MainWindow::drawTicket(QPainter &painter, const QRect &rect, QString series, int ticketNumber, int price)
+
+void MainWindow::drawTicket(QPainter &painter, const QRect &rect, QString series, QString ticketNumber, int price)
 {
     painter.save(); // Зберігаємо поточний стан
 
-    // 🔲 Зовнішня чорна рамка
+    // Зовнішня чорна рамка
     QPen borderPen(Qt::black, 2);
     painter.setPen(borderPen);
     painter.setBrush(Qt::white);
