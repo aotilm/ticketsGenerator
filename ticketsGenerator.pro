@@ -23,5 +23,11 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    resources.qrc
+RESOURCES +=
+
+VERSION = 1.0
+QMAKE_TARGET_COMPANY = Illia Muravets
+QMAKE_TARGET_PRODUCT = Tickets Generator
+
+# RC_FILE = resources.qrc
+RC_ICONS = logo.ico
